@@ -7,8 +7,9 @@ Proof-of-concept implementation of dynamic task offloading between a Physical Tw
 A running ROS2 computation node migrates from the PT role to the DT role without stopping the data producer. The migration gap is measured automatically. Three modes are implemented with increasing autonomy.
 
 ## Dashboard
+<img width="1850" height="968" alt="image" src="https://github.com/user-attachments/assets/baab444c-c825-46bf-a4f7-5aa305252b41" />
 
-![Dashboard](dashboard.png)
+
 
 Live web dashboard at `http://127.0.0.1:5000` showing node states, CPU/RAM gauges, gap timer, event log, and manual controls.
 
