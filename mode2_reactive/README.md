@@ -51,7 +51,7 @@ ros2 run task_offloading cpu_stress
 ros2 run task_offloading ram_stress
 ```
 
-Open dashboard at `http://127.0.0.1:5000`
+Open dashboard at http://127.0.0.1:5000
 
 ## Verify
 ```bash
