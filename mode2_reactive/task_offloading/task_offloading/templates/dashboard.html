@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Task Offloading Dashboard</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #e0e0e0; padding: 24px; }
+  h1 { text-align: center; color: #7eb8f7; margin-bottom: 24px; font-size: 1.6rem; letter-spacing: 1px; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+  .card { background: #1a1d27; border-radius: 12px; padding: 20px; border: 1px solid #2a2d3a; }
+  .card h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 12px; }
+
+  .status { font-size: 1.4rem; font-weight: bold; text-align: center; padding: 10px; border-radius: 8px; }
+  .active { background: #1a3a2a; color: #4cff8f; }
+  .inactive { background: #2a2a2a; color: #666; }
+
+  .metric { font-size: 2rem; font-weight: bold; text-align: center; color: #7eb8f7; }
+  .metric span { font-size: 0.9rem; color: #888; }
+
+  .bar-wrap { background: #2a2d3a; border-radius: 6px; height: 18px; overflow: hidden; margin-top: 8px; }
+  .bar { height: 100%; border-radius: 6px; transition: width 0.5s ease, background 0.5s ease; }
+
+  .gap-box { text-align: center; }
+  .gap-val { font-size: 2.5rem; font-weight: bold; color: #f7c27e; }
+  .gap-label { font-size: 0.8rem; color: #888; margin-top: 4px; }
+
+  .btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: bold; cursor: pointer; transition: all 0.2s; width: 100%; margin-bottom: 8px; }
+  .btn-offload { background: #e05555; color: white; }
+  .btn-offload:hover { background: #ff6b6b; }
+  .btn-back { background: #4a90d9; color: white; }
+  .btn-back:hover { background: #5aa0e9; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .events { list-style: none; max-height: 220px; overflow-y: auto; }
+  .events li { font-size: 0.82rem; color: #aaa; padding: 5px 0; border-bottom: 1px solid #2a2d3a; font-family: monospace; }
+  .events li:first-child { color: #7eb8f7; }
+
+  .streamer-pulse { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #4cff8f; margin-right: 8px; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .section-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #555; margin: 16px 0 8px; }
+</style>
+</head>
+<body>
+<h1>⚡ Task Offloading Dashboard</h1>
+
+<div class="grid">
+  <!-- Streamer -->
+  <div class="card">
+    <h2><span class="streamer-pulse"></span>Streamer Node</h2>
+    <div class="metric" id="stream-count">0 <span>packets</span></div>
+    <div style="text-align:center; font-size:0.8rem; color:#4cff8f; margin-top:8px;">Publishing /data/stream</div>
+  </div>
+
+  <!-- PT Logger -->
+  <div class="card">
+    <h2>PT Logger (127.0.0.1)</h2>
+    <div class="status inactive" id="pt-status">INACTIVE</div>
+    <div style="font-size:0.75rem; color:#666; text-align:center; margin-top:8px;">/logger</div>
+  </div>
+
+  <!-- DT Logger -->
+  <div class="card">
+    <h2>DT Logger (127.0.0.2)</h2>
+    <div class="status inactive" id="dt-status">INACTIVE</div>
+    <div style="font-size:0.75rem; color:#666; text-align:center; margin-top:8px;">/logger_dt</div>
+  </div>
+</div>
+
+<div class="grid2">
+  <!-- Resources -->
+  <div class="card">
+    <h2>Resource Monitor</h2>
+    <div style="margin-bottom:14px;">
+      <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+        <span>CPU</span><span id="cpu-val">0%</span>
+      </div>
+      <div class="bar-wrap"><div class="bar" id="cpu-bar" style="width:0%"></div></div>
+    </div>
+    <div>
+      <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+        <span>RAM</span><span id="ram-val">0%</span>
+      </div>
+      <div class="bar-wrap"><div class="bar" id="ram-bar" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- Gap -->
+  <div class="card gap-box">
+    <h2>Migration Gap</h2>
+    <div class="gap-val" id="gap-val">—</div>
+    <div class="gap-label" id="gap-label">No offload yet</div>
+  </div>
+</div>
+
+<!-- Controls -->
+<div class="card" style="margin-bottom:16px;">
+  <h2>Manual Controls (Mode 1)</h2>
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
+    <button class="btn btn-offload" onclick="trigger('PT_TO_DT')">
+      🔴 Offload PT → DT
+    </button>
+    <button class="btn btn-back" onclick="trigger('DT_TO_PT')">
+      🔵 Offload Back DT → PT
+    </button>
+  </div>
+</div>
+
+<!-- Event Log -->
+<div class="card">
+  <h2>Event Log</h2>
+  <ul class="events" id="events"><li style="color:#555">Waiting for events...</li></ul>
+</div>
+
+<script>
+  let prevCount = 0;
+
+  async function trigger(direction) {
+    await fetch('/trigger', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({direction})
+    });
+  }
+
+  function barColor(val, upper) {
+    if (val > upper) return '#e05555';
+    if (val > upper * 0.7) return '#f7c27e';
+    return '#4cff8f';
+  }
+
+  async function update() {
+    try {
+      const res = await fetch('/state');
+      const s = await res.json();
+
+      // streamer
+      document.getElementById('stream-count').innerHTML =
+        `${s.streamer_count} <span>packets</span>`;
+
+      // PT status
+      const pt = document.getElementById('pt-status');
+      pt.textContent = s.pt_status;
+      pt.className = 'status ' + (s.pt_status === 'ACTIVE' ? 'active' : 'inactive');
+
+      // DT status
+      const dt = document.getElementById('dt-status');
+      dt.textContent = s.dt_status;
+      dt.className = 'status ' + (s.dt_status === 'ACTIVE' ? 'active' : 'inactive');
+
+      // CPU
+      document.getElementById('cpu-val').textContent = s.cpu + '%';
+      const cpuBar = document.getElementById('cpu-bar');
+      cpuBar.style.width = Math.min(s.cpu, 100) + '%';
+      cpuBar.style.background = barColor(s.cpu, 20);
+
+      // RAM
+      document.getElementById('ram-val').textContent = s.ram + '%';
+      const ramBar = document.getElementById('ram-bar');
+      ramBar.style.width = Math.min(s.ram, 100) + '%';
+      ramBar.style.background = barColor(s.ram, 60);
+
+      // gap
+      if (s.gap_duration !== null) {
+        document.getElementById('gap-val').textContent = s.gap_duration + 's';
+        document.getElementById('gap-label').textContent = 'Last migration gap';
+      } else if (s.gap_start !== null) {
+        document.getElementById('gap-val').textContent = '...';
+        document.getElementById('gap-label').textContent = 'Gap in progress';
+      }
+
+      // events
+      if (s.events.length > 0) {
+        document.getElementById('events').innerHTML =
+          s.events.map(e => `<li>${e}</li>`).join('');
+      }
+    } catch(e) {}
+    setTimeout(update, 1000);
+  }
+
+  update();
+</script>
+</body>
+</html>
