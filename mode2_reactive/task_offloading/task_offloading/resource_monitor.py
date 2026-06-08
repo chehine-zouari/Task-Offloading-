@@ -5,7 +5,8 @@ import psutil
 
 CPU_UPPER = 20.0    # PT→DT offload threshold
 CPU_LOWER = 10.0    # DT→PT reverse offload threshold
-RAM_THRESHOLD = 80.0
+RAM_UPPER = 30.0    # trigger if RAM exceeds 30%
+RAM_LOWER = 23.0    # recover when RAM drops below 23%
 CHECK_INTERVAL = 2.0
 
 class ResourceMonitor(Node):

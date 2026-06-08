@@ -1,7 +1,7 @@
 # Mode 2 — Reactive Task Offloading
 
 ## Overview
-Resource threshold-triggered offloading. A monitor watches CPU and RAM continuously and fires the offload automatically when either crosses a threshold — no human intervention needed. Supports bidirectional migration (PT→DT and DT→PT recovery).
+Resource threshold-triggered offloading. A monitor watches CPU and RAM continuously and fires the offload automatically when either crosses a threshold, no human intervention needed. Supports bidirectional migration (PT→DT and DT→PT recovery).
 
 ## New Nodes
 | Node | Role |
@@ -14,7 +14,7 @@ Resource threshold-triggered offloading. A monitor watches CPU and RAM continuou
 | Metric | Offload trigger | Recovery trigger |
 |---|---|---|
 | CPU | > 20% | < 10% |
-| RAM | > 60% | < 50% |
+| RAM | > 30% | < 27% |
 
 ## How to Run
 Same as Mode 1 plus two extra terminals:
@@ -28,7 +28,7 @@ ros2 run task_offloading ram_stress
 ```
 
 ## Key Design Decision
-Offload fires on either CPU **or** RAM threshold crossed. Recovery requires **both** to drop below lower thresholds — prevents flapping.
+Offload fires on either CPU **or** RAM threshold crossed. Recovery requires **both** to drop below lower thresholds, prevents flapping.
 
 ## Next
 - Mode 3 — Proactive offloading (prediction-triggered)
