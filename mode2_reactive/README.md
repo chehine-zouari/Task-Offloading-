@@ -1,4 +1,4 @@
-# Mode 2 — Reactive Task Offloading
+# Mode 2: Reactive Task Offloading
 
 ## Overview
 Resource threshold-triggered offloading. A monitor watches CPU and RAM continuously and fires the offload automatically when either crosses a threshold, no human intervention needed. Supports bidirectional migration (PT→DT and DT→PT recovery).
@@ -22,7 +22,7 @@ Source first in every terminal:
 cd ~/workspaces/acc_ws && source install/setup.bash
 ```
 
-**Base setup — same as Mode 1:**
+**Base setup: same as Mode 1:**
 ```bash
 # T1
 ros2 run task_offloading streamer
@@ -57,4 +57,4 @@ Open dashboard at `http://127.0.0.1:5000`
 Offload fires on either CPU **or** RAM threshold crossed. Recovery requires **both** to drop below lower thresholds, prevents flapping.
 
 ## Next
-- Mode 3 — Proactive offloading (prediction-triggered)
+- Mode 3: Proactive offloading (prediction-triggered)

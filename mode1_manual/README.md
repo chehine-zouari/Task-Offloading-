@@ -1,4 +1,4 @@
-# Mode 1 — Manual Task Offloading
+# Mode 1: Manual Task Offloading
 
 ## Overview
 A human-triggered proof-of-concept that offloads a running ROS2 node from the Physical Twin (PT) role to the Digital Twin (DT) role within the same ROS2 environment. The migration gap is measured automatically.
@@ -44,5 +44,5 @@ ros2 lifecycle get /logger_dt   # active — DT running
 The streamer never changes. DDS automatically routes `/data/stream` to whichever logger instance is currently active, no IP updates, no restarts, no reconfiguration on the producer side.
 
 ## Next
-- Mode 2 — Reactive offloading (resource threshold-triggered)
-- Mode 3 — Proactive offloading (prediction-triggered)
+- Mode 2: Reactive offloading (resource threshold-triggered)
+- Mode 3: Proactive offloading (prediction-triggered)
