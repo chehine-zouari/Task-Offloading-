@@ -53,6 +53,12 @@ ros2 run task_offloading ram_stress
 
 Open dashboard at `http://127.0.0.1:5000`
 
+## Verify
+```bash
+ros2 lifecycle get /logger      # inactive: PT preserved
+ros2 lifecycle get /logger_dt   # active: DT running
+```
+
 ## Key Design Decision
 Offload fires on either CPU **or** RAM threshold crossed. Recovery requires **both** to drop below lower thresholds, prevents flapping.
 

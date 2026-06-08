@@ -17,27 +17,29 @@ cd ~/workspaces/acc_ws && source install/setup.bash
 ```
 Then in order:
 ```bash
-# T1
+# T1: streamer
 ros2 run task_offloading streamer
 
-# T2
+# T2: PT logger
 ros2 run task_offloading logger
 
-# T3
+# T3: Activate PT logger
 ros2 lifecycle set /logger configure
 ros2 lifecycle set /logger activate
 
-# T4
+# T4: Offload manager
 ros2 run task_offloading offload_manager
 
-# T5 — fire the trigger
-ros2 topic pub --once /offload_trigger std_msgs/msg/String "data: 'OFFLOAD_LOGGER'"
+# T5: Dashboard
+ros2 run task_offloading dashboard_node
+
 ```
+Open dashboard at http://127.0.0.1:5000
 
 ## Verify
 ```bash
-ros2 lifecycle get /logger      # inactive — PT preserved
-ros2 lifecycle get /logger_dt   # active — DT running
+ros2 lifecycle get /logger      # inactive: PT preserved
+ros2 lifecycle get /logger_dt   # active: DT running
 ```
 
 ## Key Design Decision
