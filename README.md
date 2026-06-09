@@ -8,7 +8,8 @@ A running ROS2 computation node migrates from the PT role to the DT role without
 
 ## Dashboard
 
-![Dashboard](dashboard.png)
+<img width="627" height="332" alt="Screenshot from 2026-06-09 17-15-26" src="https://github.com/user-attachments/assets/bfe9fbef-f32e-4a47-a55c-e3be4ada98ea" />
+
 
 Live web dashboard at `http://127.0.0.1:5000` showing:
 - Node states (PT/DT active/inactive) with timestamps
