@@ -27,6 +27,7 @@ setup(
         'offload_manager = task_offloading.offload_manager:main',
         'resource_monitor = task_offloading.resource_monitor:main',
         'cpu_stress = task_offloading.cpu_stress:main',
+        'ram_stress = task_offloading.ram_stress:main',
         'dashboard_node = task_offloading.dashboard_node:main',
     ],
 },
