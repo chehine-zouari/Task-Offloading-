@@ -22,7 +22,7 @@ Live web dashboard at http://127.0.0.1:5000 showing:
 
 ## Key insight
 
-The streamer never needs to know about the new logger instance. DDS maintains a live registry of active subscribers per topic — when the PT logger deactivates and the DT logger activates on the same topic, routing happens transparently. No IP updates, no restarts, no reconfiguration on the producer side.
+The streamer never needs to know about the new logger instance. DDS maintains a live registry of active subscribers per topic, when the PT logger deactivates and the DT logger activates on the same topic, routing happens transparently. No IP updates, no restarts, no reconfiguration on the producer side.
 
 ## Modes
 
