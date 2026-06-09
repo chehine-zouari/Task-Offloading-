@@ -7,11 +7,17 @@ Proof-of-concept implementation of dynamic task offloading between a Physical Tw
 A running ROS2 computation node migrates from the PT role to the DT role without stopping the data producer. The migration gap is measured automatically. Three modes are implemented with increasing autonomy.
 
 ## Dashboard
-<img width="1850" height="968" alt="image" src="https://github.com/user-attachments/assets/baab444c-c825-46bf-a4f7-5aa305252b41" />
 
+![Dashboard](dashboard.png)
 
-
-Live web dashboard at `http://127.0.0.1:5000` showing node states, CPU/RAM gauges, gap timer, event log, and manual controls.
+Live web dashboard at `http://127.0.0.1:5000` showing:
+- Node states (PT/DT active/inactive) with timestamps
+- CPU and RAM gauges with threshold lines
+- Migration gap timer and full gap history
+- Summary stats (total offloads, avg/min/max gap)
+- System health indicator (healthy / warning / critical)
+- Manual controls (Mode 1) and reactive stress controls (Mode 2)
+- CSV export of full session report
 
 ## Key insight
 
@@ -21,9 +27,9 @@ The streamer never needs to know about the new logger instance. DDS maintains a 
 
 | Mode | Trigger | Status |
 |---|---|---|
-| [Mode 1 — Manual](mode1_manual/) | Human button press | ✅ Done |
-| [Mode 2 — Reactive](mode2_reactive/) | CPU/RAM threshold crossed | ✅ Done |
-| Mode 3 — Proactive | Predicted overload | 🔄 Coming soon |
+| [Mode 1 — Manual](mode1_manual/) | Human button press or dashboard button | ✅ Done |
+| [Mode 2 — Reactive](mode2_reactive/) | CPU/RAM threshold crossed automatically | ✅ Done |
+| Mode 3 — Proactive | Predicted overload before threshold is hit | 🔄 Coming soon |
 
 ## Architecture
 
@@ -49,7 +55,9 @@ streamer_node → /data/stream → logger (PT) [inactive]     │
                              → logger_dt (DT) [active] ←──┘
 
 /pt/cpu_usage ↗
-/pt/ram_usage ↗  live metrics published to dashboard
+/pt/ram_usage ↗  live metrics + safety warnings published to dashboard
+
+recovery: CPU < 10% → offload_manager → deactivate DT → reactivate PT
 ```
 
 ### Mode 3 — Proactive (coming soon)
@@ -57,6 +65,26 @@ streamer_node → /data/stream → logger (PT) [inactive]     │
 ```
 resource_monitor → prediction model → /offload_trigger → offload_manager
                    (forecasts overload before threshold is crossed)
+```
+
+## Node inventory
+
+| Node | Role | Used in |
+|---|---|---|
+| `streamer.py` | Publishes data to `/data/stream` at 1Hz | Modes 1, 2, 3 |
+| `logger.py` | Lifecycle node — offloadable computation | Modes 1, 2, 3 |
+| `offload_manager.py` | Orchestrates hot-swap, measures gap, lock-protected | Modes 1, 2, 3 |
+| `dashboard_node.py` | Flask ROS2 node — live web dashboard | Modes 1, 2, 3 |
+| `resource_monitor.py` | CPU/RAM monitor, auto-triggers offload | Modes 2, 3 |
+| `cpu_stress.py` | Simulates CPU overload (3 intensity levels) | Mode 2 |
+| `ram_stress.py` | Simulates RAM overload (3 intensity levels) | Mode 2 |
+
+## Setup
+
+```bash
+cd ~/workspaces/acc_ws
+colcon build --packages-select task_offloading
+source install/setup.bash
 ```
 
 ## Repository structure
@@ -67,12 +95,3 @@ Task-Offloading/
 ├── mode2_reactive/     ← resource threshold implementation
 └── mode3_proactive/    ← prediction-based (coming soon)
 ```
-
-## Setup
-
-```bash
-cd ~/workspaces/acc_ws
-colcon build --packages-select task_offloading
-source install/setup.bash
-```
-
