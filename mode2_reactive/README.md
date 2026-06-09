@@ -68,8 +68,7 @@ ros2 run task_offloading dashboard_node
 # T6: resource monitor (replaces manual trigger)
 ros2 run task_offloading resource_monitor
 ```
-
-Open dashboard at `http://127.0.0.1:5000` and use the **Mode 2 — Reactive Controls** section to start CPU/RAM stress at any intensity level.
+Open dashboard at http://127.0.0.1:5000 and use the **Mode 2 Reactive Controls** section to start CPU/RAM stress at any intensity level.
 
 ## Verify
 ```bash
